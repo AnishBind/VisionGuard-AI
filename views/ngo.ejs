@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HealthConnect NGO</title>
+    <style>
+        *{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Nunito, sans-serif;
+    scroll-behavior: smooth;
+}
+
+:root{
+    --bg-color: #ffffff;
+    --main-color: #2393d2;
+    --text-color: #000000;
+    --secondary-color: #f4821f;
+}
+
+
+nav{
+    position: fixed;
+    width: 100vw;
+    height: 3.5rem;
+    background-color: #231F20;
+    padding: 0 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+nav h1{
+    color: var(--bg-color);
+}
+
+nav button{
+    height: 2rem;
+    padding: 0px 1.4rem;
+    background-color: var(--main-color);
+    color: #ffffff;
+    border-radius: 1.5rem;
+    transition: 0.3s;
+    border: none;
+    align-content: center;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: .9rem;
+}
+
+nav button:hover{
+    color: var(--text-color);
+}
+
+body{
+    height: 100vh;
+}
+
+.profile-card p {
+    margin: 8px 0;
+}
+
+.profile-card h2 {
+    margin-top: 0;
+    text-align: center;
+}
+
+
+.logout_btn {
+    position: relative;
+    width: 100%;
+    height: 2rem;
+    background-color: var(--main-color);
+    box-shadow: 0 0 2px var(--main-color);
+    outline: none;
+    border: none;
+    border-radius: 1.5rem;
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: rgb(233, 4, 4);
+    font-weight: bold;
+    overflow: hidden;
+    transition: .3s;
+}
+
+.logout_btn:hover {
+    box-shadow: 0 0 6px var(--main-color);
+}
+
+main {
+    display: flex;
+    margin: 0;
+    height: 100vh;
+}
+.sidebar {
+    width: 15rem;
+    background-color: #f8f8f8;
+    padding: 10px;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    position: fixed;
+    top: 3.45rem;
+    bottom: 0;
+    border-right: 2px solid rgb(59, 59, 59);
+}
+
+.sidebar button {
+    display: block;
+    width: 100%;
+    padding: 2rem 0;
+    margin: 10px 0;
+    border: 2px solid black;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: var(--main-color);
+    color: white;
+    font-size: 16px;
+    text-align: center;
+}
+
+.sidebar_img img{
+    width: 14rem;
+    border-radius: 1rem;
+    border: 2px solid black;
+}
+
+.sidebar button:hover{
+    background-color: #02a2ff;
+}
+
+.sidebar button.active{
+    background-color: #6632a8;
+}
+
+
+.content {
+    margin: 3.35rem 0 0 15rem;
+    padding: 20px;
+    flex-grow: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-wrap: wrap;
+    display: none;
+}
+
+.content.active {
+    display: flex;
+}
+
+.patientcard{
+    background-color: #e0e0e0;
+    box-shadow: 6px 8px 4px rgba(0, 0, 0, 0.1);
+    border: 1px solid black;
+    width: 100%;
+    padding: 1rem;
+    margin: 1rem;
+    border-radius: 5px;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.acceptbtn{
+    background-color: #00b300;
+    box-shadow: 0 0 4px #00b300;
+    border: 1px solid black;
+    color: white;
+    margin-top: 4px;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.rejectbtn{
+    background-color: #00b300;
+    box-shadow: 0 0 4px #00b300;
+    border: 1px solid black;
+    color: white;
+    margin-top: 4px;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+    align-items: center;
+    justify-content: center;
+}
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 25rem;
+}
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+.appointment-form {
+    display: flex;
+    flex-direction: column;
+}
+.appointment-form label {
+    margin-top: 10px;
+}
+
+.appointment-form input,textarea{
+    width: 100%;
+    padding: 8px;
+    margin: 5px 0 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.appointment-form button{
+    width: 100%;
+    padding: 10px;
+    border: none;
+    background-color: var(--main-color);
+    color: var(--bg-color);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    border-radius: 35px;
+    font-weight: bold;
+    transition: .3s;
+}
+
+.appointment-form button:hover {
+    background-color: #1371d6;
+    box-shadow: 0 0 6px  var(--blue-color);
+}
+
+/* NGO section  */
+
+.card {
+    background-color: #e0e0e0;
+    box-shadow: 6px 8px 4px rgba(0, 0, 0, 0.1);
+    border: 1px solid black;
+    width: 100%;
+    padding: 1rem;
+    margin: 1rem;
+    border-radius: 5px;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card button {
+    background-color: #00b300;
+    box-shadow: 0 0 4px #00b300;
+    border: 1px solid black;
+    margin-top: 4px;
+    color: white;
+    border: 1px solid gray;
+    padding: 10px 20px;
+    margin: 5px 4px;
+    border-radius: 5px;
+    cursor: pointer;
+   
+}
+
+    </style>
+
+    
+</head>
+
+<body>
+
+    <header>
+        <nav>
+            <h1>HealthConnect</h1>
+            <button onclick="openModal('profile', '<%= user.user.email %>')"><%= user.user.name %></button>
+        </nav>
+    </header>
+
+    <div id="profile" class="profile-card modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('profile')">&times;</span>
+            <h2>Profile Information</h2>
+            <p><strong>Name:</strong> <%= user.user.name %></p>
+            <p><strong>Email:</strong> <%= user.user.email %></p>
+            <p><strong>Phone:</strong> <%= user.user.phone %></p>
+            <p><strong>Date of Birth:</strong> <%= new Date(user.user.dob).toLocaleDateString() %></p>
+            <p><strong>Role:</strong> <%= user.user.role %></p>
+            
+            <% if (user.user.role === 'doctor') { %>
+                <p><strong>Specialization:</strong> <%= user.user.specialization %></p>
+                <p><strong>Experience:</strong> <%= user.user.experience %></p>
+                <p><strong>Hours:</strong> <%= user.user.hours %></p>
+            <% } %>
+
+            <% if (user.user.role === 'ngo') { %>
+                <p><strong>NGO Description:</strong> <%= user.user.ngo_description %></p>
+            <% } %>
+
+            <button class="logout_btn" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <main>
+        <div class="sidebar">
+            <button data-section="member" onclick="showContent('member')" class="active">Member Request</button>
+            <button data-section="donation" onclick="showContent('donation')" >Donation</button>
+            <button data-section="help" onclick="showContent('help')">Help</button>
+            <button data-section="report" onclick="showContent('report')">Reports</button>
+            <div class="sidebar_img">
+                <img src="https://i.pinimg.com/564x/d8/78/4a/d8784a64f165a780339d97d6139e1373.jpg" alt="sidebar_img" >
+            </div>
+        </div>
+
+        <div id="member" class="content active">
+            <div class="card-container">
+                <% if (members && members.length > 0) { %>
+                <% members.forEach(member => { %>
+                    <div class="card">
+                        <p><strong>Name:</strong> <%= member.name %></p>
+                        <p><strong>Email:</strong> <%= member.email %></p>
+                        <p><strong>Phone:</strong> <%= member.phone %></p>
+                        <p><strong>Special Notes:</strong> <%= member.special_notes %></p>
+                        <form action="/acceptMember" method="POST" style="display:inline;">
+                            <input type="hidden" name="memberId" value="<%= member.email %>">
+                            <button type="submit" class="acceptbtn">Accept</button>
+                        </form>
+                        <form action="/rejectMember" method="POST" style="display:inline;">
+                            <input type="hidden" name="memberId" value="<%= member.id %>">
+                            <button type="submit" class="rejectbtn">Reject</button>
+                        </form>
+                    </div>
+                <% }) %>
+                <% } else { %>
+                    <h2>No Member Request available.</h2>
+                <% } %>
+            </div>
+        </div>
+
+        <div id="donation" class="content">
+            <div class="card-container">
+                <% if (donations && donations.length > 0) { %>
+                <% donations.forEach(donation => { %>
+                    <div class="card">
+                        <p><strong>Name:</strong> <%= donation.name %></p>
+                        <p><strong>Email:</strong> <%= donation.email %></p>
+                        <p><strong>Amount:</strong> <%= donation.amount %></p>
+                        <p><strong>Purpose:</strong> <%= donation.purpose %></p>
+                        <p><strong>UPI ID:</strong> <%= donation.upi_id %></p>
+                    </div>
+                <% }) %>
+                <% } else { %>
+                    <h2>No Donations available.</h2>
+                <% } %>
+            </div>
+        </div>
+
+        <div id="help" class="content">
+            <div class="card-container">
+                <% if (helpRequests && helpRequests.length > 0) { %>
+                <% helpRequests.forEach(help => { %>
+                    <div class="card">
+                        <p><strong>Name:</strong> <%= help.name %></p>
+                        <p><strong>Email:</strong> <%= help.email %></p>
+                        <p><strong>Phone:</strong> <%= help.phone %></p>
+                        <p><strong>Description:</strong> <%= help.description %></p>
+                        <form action="/acceptHelp" method="POST" style="display:inline;">
+                            <input type="hidden" name="helpId" value="<%= help.id %>">
+                            <button type="submit" class="acceptbtn">Accept</button>
+                        </form>
+                    </div>
+                <% }) %>
+                <% } else { %>
+                    <h2>No Help Requests available.</h2>
+                <% } %>
+            </div>
+        </div>
+
+        <div id="report" class="content">
+            <div class="card-container">
+                <% if (reports && reports.length > 0) { %>
+                <% reports.forEach(report => { %>
+                    <div class="card">
+                        <p><strong>Name:</strong> <%= report.name %></p>
+                        <p><strong>Email:</strong> <%= report.email %></p>
+                        <p><strong>Phone:</strong> <%= report.phone_number %></p>
+                        <p><strong>Incident Details:</strong> <%= report.incident_details %></p>
+                        <p><strong>Resolution:</strong> <%= report.resolution %></p>
+                    </div>
+                <% }) %>
+                <% } else { %>
+                    <h2>No Reports available.</h2>
+                <% } %>
+            </div>
+        </div>
+        
+
+    </main>
+
+
+
+    <script >
+
+        function openModal(modalId,ngoEmail) {
+            document.getElementById(modalId).style.display = "flex";
+            document.getElementById('ngoEmail').value = ngoEmail;
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = "none";
+        }
+        
+        function showContent(sectionId) {
+            const contents = document.getElementsByClassName('content');
+            for(let i = 0; i<4;i++){
+                contents[i].classList.remove('active');
+            };
+            document.getElementById(sectionId).classList.add('active');
+            
+            const buttons = document.querySelectorAll('.sidebar button');
+            buttons.forEach(button => {
+                button.classList.remove('active');
+            });
+            document.querySelector(`.sidebar button[data-section="${sectionId}"]`).classList.add('active');
+        }
+
+        function logout() {
+            fetch('/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '/';
+                } else {
+                    alert('Error logging out');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
+        }
+
+    </script>
+
+</body>
+</html>

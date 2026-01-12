@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create an Account</title>
+
+<style>
+    *{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Times New Roman', Times, serif;
+}
+
+:root{
+    --white-color: #ffffff;
+    --blue-color:  #2393d2;
+    --orange-color: #f4821f;
+    --text-color: black;
+}
+
+body{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.form-container {
+    width: 25rem;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 2px 2px 12px #aaa;
+}
+.form-container h2 {
+    text-align: center;
+}
+.form-container label {
+    display: block;
+    margin: 0px 0 5px;
+}
+.form-container input, .form-container select, .form-container textarea {
+    width: 100%;
+    padding: 8px;
+    margin: 5px 0 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+.form-container button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background-color: var(--blue-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    border-radius: 35px;
+    font-weight: bold;
+    transition: .3s;
+}
+.form-container button:hover {
+    background-color: #1371d6;
+    box-shadow: 0 0 6px  var(--blue-color);
+}
+
+.logreg-link {
+    font-size: 1rem;
+    color: var(--text-color);
+    text-align: center;
+    margin: .5rem 0;
+}
+
+.logreg-link p a{
+    color: var(--blue-color);
+    text-decoration: none;
+    font-weight:bold;
+
+}
+
+.logreg-link p a:hover{
+    text-decoration: underline;
+}
+
+</style>
+    
+</head>
+<body>
+    <div class="form-container">
+        <h2>Create an Account</h2>
+        <form onsubmit="handleSignup(event)">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+            
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+            
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+            
+            <label for="role">Role:</label>
+            <select id="role" name="role" onchange="updateForm()" required>
+                <option value="">Select a role</option>
+                <option value="doctor">Doctor</option>
+                <option value="patient">Patient</option>
+                <option value="ngo">NGO</option>
+            </select>
+            
+            <div id="doctorFields" style="display: none;">
+                <label for="specialization">Specialization:</label>
+                <input type="text" id="specialization" name="specialization">
+                
+                <label for="experience">Work Experience:</label>
+                <input type="text" id="experience" name="experience">
+                
+                <label for="hours">Working Hours:</label>
+                <input type="text" id="hours" name="hours">
+            </div>
+            
+            <div id="ngoField" style="display: none;">
+                <label for="ngoDescription">What does your NGO do?</label>
+                <textarea id="ngoDescription" name="ngoDescription"></textarea>
+            </div>
+            
+            <p>Note: This is a volunteering website so no fees would be charged from a patient to a doctor</p>
+            
+            <label for="dob">Date of Birth:</label>
+            <input type="date" id="dob" name="dob" required>
+            
+            <label for="phone">Phone Number:</label>
+            <input type="text" id="phone" name="phone" required>
+            
+            <button type="submit">Sign in</button>
+            <div class="logreg-link" >
+                <p >Already have an account? <a href="/login" class="register-link" >Log in</a></p>
+        </div>
+        </form>
+    </div>
+
+    <script>
+        function updateForm() {
+            const role = document.getElementById('role').value;
+            const doctorFields = document.getElementById('doctorFields');
+            const ngoField = document.getElementById('ngoField');
+            
+            doctorFields.style.display = role === 'doctor' ? 'block' : 'none';
+            ngoField.style.display = role === 'ngo' ? 'block' : 'none';
+        }
+
+        function handleSignup(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const role = document.getElementById('role').value;
+            const dob = document.getElementById('dob').value;
+            const phone = document.getElementById('phone').value;
+            const specialization = document.getElementById('specialization') ? document.getElementById('specialization').value : null;
+            const experience = document.getElementById('experience') ? document.getElementById('experience').value : null;
+            const hours = document.getElementById('hours') ? document.getElementById('hours').value : null;
+            const ngoDescription = document.getElementById('ngoDescription') ? document.getElementById('ngoDescription').value : null;
+            
+            const signupData = { name, email, password, role, dob, phone, specialization, experience, hours, ngoDescription };
+
+
+            fetch('/signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(signupData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Registration successful');
+                    window.location.href = '/login'; // Redirect to login on success
+                } else {
+                    alert(data.message); // Show error message
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
+        }
+    </script>
+
+</body>
+</html>

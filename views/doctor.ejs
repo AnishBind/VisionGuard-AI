@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />    <title>Doctor Homepage</title>
+
+    <style>
+        *{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Nunito, sans-serif;
+    scroll-behavior: smooth;
+}
+
+:root{
+    --bg-color: #ffffff;
+    --main-color: #0fda34;
+    --text-color: #000000;
+    --secondary-color: #f4821f;
+}
+
+
+nav{
+    position: fixed;
+    width: 100vw;
+    height: 3.5rem;
+    background-color: #231F20;
+    padding: 0 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+nav h1{
+    color: var(--bg-color);
+}
+
+nav button{
+    height: 2rem;
+    padding: 0px 1.4rem;
+    background-color: var(--main-color);
+    color: #ffffff;
+    border-radius: 1.5rem;
+    transition: 0.3s;
+    border: none;
+    align-content: center;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: .9rem;
+}
+
+nav button:hover{
+    color: var(--text-color);
+}
+
+body{
+    height: 100vh;
+}
+
+.profile-card p {
+    margin: 8px 0;
+}
+
+.profile-card h2 {
+    margin-top: 0;
+    text-align: center;
+}
+
+
+.logout_btn {
+    position: relative;
+    width: 100%;
+    height: 2rem;
+    background-color: var(--main-color);
+    box-shadow: 0 0 2px var(--main-color);
+    outline: none;
+    border: none;
+    border-radius: 1.5rem;
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: rgb(233, 4, 4);
+    font-weight: bold;
+    overflow: hidden;
+    transition: .3s;
+}
+
+.logout_btn:hover {
+    box-shadow: 0 0 6px var(--main-color);
+}
+
+main {
+    display: flex;
+    margin: 0;
+    height: 100vh;
+}
+.sidebar {
+    width: 15rem;
+    background-color: #f8f8f8;
+    padding: 10px;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    position: fixed;
+    top: 3.45rem;
+    bottom: 0;
+    border-right: 2px solid rgb(59, 59, 59);
+}
+
+.sidebar button {
+    display: block;
+    width: 100%;
+    padding: 2rem 0;
+    margin: 10px 0;
+    border: 2px solid black;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: var(--main-color);
+    color: white;
+    font-size: 16px;
+    text-align: center;
+}
+
+.sidebar_img img{
+    width: 14rem;
+    border-radius: 1rem;
+    border: 2px solid black;
+}
+
+.sidebar button:hover{
+    background-color: #02a2ff;
+}
+
+.sidebar button.active{
+    background-color: #6632a8;
+}
+
+
+.content {
+    margin: 3.35rem 0 0 15rem;
+    padding: 20px;
+    flex-grow: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-wrap: wrap;
+    display: none;
+}
+
+.content.active {
+    display: flex;
+}
+
+.patientcard{
+    background-color: #e0e0e0;
+    width: 100%;
+    padding: 1rem;
+    margin: 1rem;
+    border-radius: 5px;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 6px 8px 4px rgba(0, 0, 0, 0.1);
+    border: 1px solid black;
+}
+
+.acceptbtn{
+    background-color: #00b300;
+    box-shadow: 0 0 4px #00b300;
+    border: 1px solid black;
+    color: white;
+    margin-top: 4px;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.rejectbtn{
+    background-color: #00b300;
+    box-shadow: 0 0 4px #00b300;
+    border: 1px solid black;
+    color: white;
+    margin-top: 4px;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+    align-items: center;
+    justify-content: center;
+}
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 25rem;
+}
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+.appointment-form {
+    display: flex;
+    flex-direction: column;
+}
+.appointment-form label {
+    margin-top: 10px;
+}
+
+.appointment-form input,textarea{
+    width: 100%;
+    padding: 8px;
+    margin: 5px 0 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.appointment-form button{
+    width: 100%;
+    padding: 10px;
+    border: none;
+    background-color: var(--main-color);
+    color: var(--bg-color);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    border-radius: 35px;
+    font-weight: bold;
+    transition: .3s;
+}
+
+.appointment-form button:hover {
+    background-color: #1371d6;
+    box-shadow: 0 0 6px  var(--blue-color);
+}
+
+/* NGO section  */
+
+.ngocard {
+    background-color: #e0e0e0;
+    width: 100%;
+    padding: 1rem;
+    margin: 1rem;
+    border-radius: 5px;
+    box-shadow: 6px 8px 4px rgba(0, 0, 0, 0.1);
+    border: 1px solid black;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ngocard button {
+    background-color: #00b300;
+    box-shadow: 0 0 4px #00b300;
+    border: 1px solid black;
+    color: white;
+    padding: 10px 20px;
+    margin: 5px 4px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: .5s;
+}
+
+.ngocard button:hover{
+    box-shadow: 0 0 10px #00b300;
+}
+
+    </style>
+
+</head>
+<body>
+    
+    <header>
+        <nav>
+            <h1>HealthConnect</h1>
+            <button onclick="openModal('profile', '<%= user.user.email %>')"><%= user.user.name %></button>
+        </nav>
+    </header>
+
+    <div id="profile" class="profile-card modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('profile')">&times;</span>
+            <h2>Profile Information</h2>
+            <p><strong>Name:</strong> <%= user.user.name %></p>
+            <p><strong>Email:</strong> <%= user.user.email %></p>
+            <p><strong>Phone:</strong> <%= user.user.phone %></p>
+            <p><strong>Date of Birth:</strong> <%= new Date(user.user.dob).toLocaleDateString() %></p>
+            <p><strong>Role:</strong> <%= user.user.role %></p>
+            
+            <% if (user.user.role === 'doctor') { %>
+                <p><strong>Specialization:</strong> <%= user.user.specialization %></p>
+                <p><strong>Experience:</strong> <%= user.user.experience %></p>
+                <p><strong>Hours:</strong> <%= user.user.hours %></p>
+            <% } %>
+
+            <% if (user.user.role === 'ngo') { %>
+                <p><strong>NGO Description:</strong> <%= user.user.ngo_description %></p>
+            <% } %>
+
+            <button class="logout_btn" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    
+
+        <main>
+            <div class="sidebar">
+                <button data-section="total_patient" onclick="showContent('total_patient')" class="active">Total patients</button>
+                <button data-section="appointment" onclick="showContent('appointment')" >Upcoming Appointments</button>
+                <button data-section="consultation" onclick="showContent('consultation')">Consultation</button>
+                <button data-section="ngo" onclick="showContent('ngo')">Contact an NGO</button>
+                <div class="sidebar_img">
+                    <img src="https://i.pinimg.com/564x/b6/6a/74/b66a74bd4ec57fee04cfca1c5f62cc24.jpg" alt="sidebar_img" >
+                </div>
+            </div>
+    
+            <div id="total_patient" class="content active">
+                <% if (patients && patients.length > 0) { %>
+                    <% patients.forEach((patient) => { %>
+                        <div class="patientcard">
+                            <p>Name : </p><h4><%= patient.name %></h4>
+                            <p>Email : </p><h4><%= patient.email %></h4>
+                            <p>Doctor Email : </p><h4><%= patient.doctor_email %></h4>
+                            <p>Reason of consultation: </p><h4><%= patient.your_reason_of_consultation %></h4>
+                        </div>
+                    <% }); %>
+                <% } else { %>
+                    <h2>No patients available.</h2>
+                <% } %>
+                
+            </div>
+    
+            <div id="appointment" class="content">
+                <% if (appointments && appointments.length > 0) { %>
+                    <% appointments.forEach((appointment) => { %>
+                        <div class="patientcard">
+                            <p>Name: </p><h4><%= appointment.name %></h4>
+                            <p>Email: </p><h4><%= appointment.email %></h4>
+                            <p>Appointment Time: </p><h4><%= appointment.select_appointment_time %></h4>
+                            <p>Reason of consultation: </p><h4><%= appointment.your_reason_of_consultation %></h4>
+                            
+                            <!-- Buttons for accepting or rejecting the appointment -->
+                            <form action="/appointments/accept/<%= appointment.id %>" method="POST" style="display:inline;">
+                                <button type="submit" class="acceptbtn">Accept</button>
+                            </form>
+                            <form action="/appointments/reject/<%= appointment.id %>" method="POST" style="display:inline;">
+                                <button type="submit" class="rejectbtn">Reject</button>
+                            </form>
+                        </div>
+                    <% }); %>
+                <% } else { %>
+                    <h2>No appointments available.</h2>
+                <% } %>
+            </div>
+            
+            
+    
+            <div id="consultation" class="content">
+                <% if (consultations && consultations.length > 0) { %>
+                    <% consultations.forEach((row) => { %>
+                        <div class="patientcard">
+                            <p>Name : </p><h4><%= row.name %></h4>
+                            <p>Email : </p><h4><%= row.email %></h4>
+                            <p>Appointment Time : </p><h4><%= row.select_appointment_time %></h4>
+                            <p>Reason of consultation: </p><h4><%= row.your_reason_of_consultation %></h4>
+                            <button class="acceptbtn"><i class="fa-solid fa-phone"></i> Voice call</button>
+                            <button class="rejectbtn"><i class="fa-solid fa-video"></i> Video Call</button>
+                        </div>
+                    <% }); %>
+                <% } else { %>
+                    <h2>No consultations available.</h2>
+                <% } %>
+            </div>
+    
+            <div id="ngo" class="content">
+                <% if (ngo && ngo.length > 0) { %>
+                    <% ngo.forEach((row) => { %>
+                        <div class="ngocard">
+                            <h4 ><%= row.ngo_description %></h4>
+                            <button onclick="openModal('modal1', '<%= row.email %>')">Be a member</button>
+                            <button onclick="openModal('modal2', '<%= row.email %>')">Donate</button>
+                            <button onclick="openModal('modal3', '<%= row.email %>')">Ask for help</button>
+                            <button onclick="openNgoMembers('modal4', '<%= row.email %>')">Our existing members</button>
+                        </div>
+                <% }); %>
+                <% } else { %>
+                    <h2>No NGO available.</h2>
+                <% } %>
+            </div>
+                
+        </main>
+
+
+        <!-- Model section  -->
+
+
+        <div id="modal1" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal('modal1')">&times;</span>
+                <h2>Be a member</h2>
+                <form id="membership-form" class="appointment-form">
+                    <input type="hidden" id="ngoEmail" name="ngoEmail" value="">
+                    <label for="mname">Name:</label>
+                    <input type="text" id="mname" name="name" required>
+                    <label for="memail">Email:</label>
+                    <input type="email" id="memail" name="email" required>
+                    <label for="mphone">Phone Number:</label>
+                    <input type="tel" id="mphone" name="phone" required>
+                    <label for="mquary">Any special you want to mention</label>
+                    <textarea id="mquary" name="quary"></textarea>
+                    <button type="submit">Submit</button>
+                </form>
+            </div>
+        </div>
+
+
+        <div id="modal2" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal('modal2')">&times;</span>
+                <h2>Make a Donation</h2>
+                <form id="a-donation-form" class="appointment-form">
+                    <label for="a-name">Name:</label>
+                    <input type="text" id="a-name" name="name" required>
+                    <label for="a-email">Email:</label>
+                    <input type="email" id="a-email" name="email" required>
+                    <label for="a-amount">Amount:</label>
+                    <input type="number" id="a-amount" name="amount" step="0.01" required>
+                    <label for="a-purpose">Anything you like to mention:</label>
+                    <textarea id="a-purpose" name="purpose" required></textarea>
+                    <label for="a-upi_id">UPI ID:</label>
+                    <input type="text" id="a-upi_id" name="upi_id" required>
+                    <button type="submit">Submit</button>
+                </form>
+            </div>
+        </div>
+
+
+        <div id="modal3" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal('modal3')">&times;</span>
+                <h2>Ask for help</h2>
+                <form id="help-form" class="appointment-form">
+                    <label for="hname">Name:</label>
+                    <input type="text" id="hname" name="name" required>
+                    <label for="hemail">Email:</label>
+                    <input type="email" id="hemail" name="email" required>
+                    <label for="hphone">Phone Number:</label>
+                    <input type="tel" id="hphone" name="phone" required>
+                    <label for="hquary">Which kind of help do you require</label>
+                    <textarea id="hquary" name="quary"></textarea>
+                    <button type="submit">Submit</button>
+                </form>
+            </div>
+        </div>
+
+
+        <div id="modal4" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal('modal4')">&times;</span>
+                <h2>Our Existing Members </h2>
+                <div id="membersList"></div>
+            </div>
+        </div>
+
+    <script>
+        function showContent(sectionId) {
+            const contents = document.getElementsByClassName('content');
+            for(let i = 0; i<4;i++){
+                contents[i].classList.remove('active');
+            };
+            document.getElementById(sectionId).classList.add('active');
+            
+            const buttons = document.querySelectorAll('.sidebar button');
+            buttons.forEach(button => {
+                button.classList.remove('active');
+            });
+            document.querySelector(`.sidebar button[data-section="${sectionId}"]`).classList.add('active');
+        }
+
+        
+        function openModal(modalId,ngoEmail) {
+          document.getElementById(modalId).style.display = "flex";
+          document.getElementById('ngoEmail').value = ngoEmail;
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                document.querySelectorAll('.modal').forEach(modal => {
+                    modal.style.display = "none";
+                });
+            }
+        }
+
+        document.getElementById('membership-form').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent default form submission
+
+        const name = document.getElementById('mname').value;
+        const email = document.getElementById('memail').value;
+        const phone = document.getElementById('mphone').value;
+        const quary = document.getElementById('mquary').value;
+        const ngoEmail = document.getElementById('ngoEmail').value;
+
+        const data = { name, email, phone, quary,ngoEmail};
+
+        fetch('/add-member', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.success) {
+                alert('Member added successfully');
+                // Optionally, you can also reset the form or close the modal
+                document.getElementById('membership-form').reset();
+                closeModal('modal1');
+            } else {
+                alert('Error adding member: ' + result.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error adding member');
+        });
+        });
+
+        document.getElementById('help-form').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const name = document.getElementById('hname').value;
+            const email = document.getElementById('hemail').value;
+            const phone = document.getElementById('hphone').value;
+            const quary = document.getElementById('hquary').value;
+            const ngoEmail = document.getElementById('ngoEmail').value;
+
+            const data = { name, email, phone, description: quary,ngoEmail };
+
+            fetch('/add-help', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    alert('Help request added successfully');
+                    document.getElementById('help-form').reset();
+                    closeModal('modal3');
+                } else {
+                    alert('Error adding help request: ' + result.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error adding help request');
+            });
+        });
+
+        document.getElementById('a-donation-form').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const name = document.getElementById('a-name').value;
+            const email = document.getElementById('a-email').value;
+            const amount = document.getElementById('a-amount').value;
+            const purpose = document.getElementById('a-purpose').value;
+            const upi_id = document.getElementById('a-upi_id').value;
+            const ngoemail = document.getElementById('ngoEmail').value;
+
+            const data = { name, email, amount, purpose, upi_id, ngoemail };
+
+            fetch('/add-donation', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    alert('Donation added successfully');
+                    document.getElementById('a-donation-form').reset();
+                    closeModal('modal4');
+                } else {
+                    alert('Error adding donation: ' + result.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error adding donation');
+            });
+        });
+
+        function logout() {
+            fetch('/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '/';
+                } else {
+                    alert('Error logging out');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
+        }
+
+        function openNgoMembers(modalId, ngoEmail) {
+            fetch(`/ngo-members/${ngoEmail}`)
+                .then(response => response.json())
+                .then(data => {
+                    const members = data.members;
+                    const membersList = document.getElementById('membersList');
+                    membersList.innerHTML = ''; // Clear previous members
+
+                    if(members.length==0){
+                        membersList.innerHTML = 'No Members';
+                    }
+
+                    members.forEach(member => {
+                        const listItem = document.createElement('p');
+                        listItem.innerHTML = "Name : " + member.name + "<br>" +
+                                                "Email : "  + member.email + "<br>" +
+                                                "Number : " + member.phone;
+                        const line = document.createElement('hr');
+                        membersList.appendChild(listItem);
+                        membersList.appendChild(line);
+                    });
+
+                    openModal(modalId);
+                })
+                .catch(error => console.error('Error fetching NGO members:', error));
+        }
+
+
+
+
+    </script>
+
+</body>
+</html>
