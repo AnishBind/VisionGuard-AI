@@ -1,3 +1,5 @@
+# HealthConnect
+
 # 🏥 Hospital & NGO Management System
 
 A full-stack **Node.js** application designed to streamline healthcare services, doctor–patient interactions, and NGO community support.  
