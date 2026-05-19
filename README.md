@@ -60,17 +60,10 @@ Inspired by enterprise Edge AI systems used in warehouses, logistics centers, fa
 
 ## 📹 Project Demonstration
 
-Watch the complete VisionGuard AI demo here:
 
-```md
-https://github.com/yourusername/VisionGuardAI/assets/demo-video-link
-```
+https://github.com/user-attachments/assets/b45ae5a9-37fc-478c-9e82-7cd98aaeceed
 
-OR
 
-```md
-uploads/VisionGuard AI.mp4
-```
 
 ### 🚀 Demo Includes
 
