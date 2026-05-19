@@ -242,10 +242,7 @@ The project focuses on:
 
 ## 👨‍💻 Author
 
-Aashish Paramhans Bind
-
-B.E. Electronics & Telecommunication Engineering
-Honors Specialization in Artificial Intelligence & Machine Learning
+Anish 
 
 ---
 
