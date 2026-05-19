@@ -1,0 +1,17 @@
+# Web framework
+flask==3.0.3
+
+# Computer vision
+opencv-python==4.10.0.84
+
+# Pose estimation
+mediapipe>=0.10.0
+
+# Object detection
+ultralytics>=8.3.0
+
+# Numerical — use 1.x on Python 3.9–3.12; 2.x wheels required on 3.13+
+numpy>=1.24.0
+
+# Pillow is needed by ultralytics for image handling
+Pillow>=10.0.0

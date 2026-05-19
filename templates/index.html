@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VisionGuard AI</title>
+    <style>
+        :root {
+            --bg: #05070d;
+            --bg-soft: #090d16;
+            --panel: rgba(12, 18, 30, 0.72);
+            --panel-strong: rgba(13, 19, 32, 0.9);
+            --stroke: rgba(137, 160, 190, 0.18);
+            --stroke-bright: rgba(86, 211, 255, 0.34);
+            --text: #edf6ff;
+            --muted: #8fa1b8;
+            --dim: #536173;
+            --green: #32f59b;
+            --orange: #ffb84a;
+            --red: #ff4d64;
+            --blue: #55a7ff;
+            --cyan: #48d8ff;
+            --shadow: 0 24px 80px rgba(0, 0, 0, 0.42);
+            --radius: 18px;
+            color-scheme: dark;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            color: var(--text);
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background:
+                radial-gradient(circle at 16% -8%, rgba(50, 245, 155, 0.13), transparent 28%),
+                radial-gradient(circle at 88% 8%, rgba(72, 216, 255, 0.14), transparent 30%),
+                linear-gradient(145deg, #03050a 0%, #07101b 46%, #04060b 100%);
+            letter-spacing: 0;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.028) 1px, transparent 1px);
+            background-size: 42px 42px;
+            mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), transparent 72%);
+        }
+
+        button, input { font: inherit; }
+
+        .app-shell {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            padding: 18px;
+            gap: 14px;
+        }
+
+        .topbar,
+        .toolbar,
+        .glass-panel {
+            background: linear-gradient(180deg, rgba(18, 27, 43, 0.86), rgba(10, 15, 26, 0.66));
+            border: 1px solid var(--stroke);
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+        }
+
+        .topbar {
+            min-height: 68px;
+            border-radius: var(--radius);
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 220px;
+        }
+
+        .brand-mark {
+            width: 38px;
+            height: 38px;
+            display: grid;
+            place-items: center;
+            border-radius: 12px;
+            color: #05120d;
+            font-size: 12px;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--green), var(--cyan));
+            box-shadow: 0 0 28px rgba(50, 245, 155, 0.28);
+        }
+
+        .logo {
+            display: block;
+            font-size: 19px;
+            font-weight: 800;
+            color: #fff;
+            line-height: 1.1;
+        }
+
+        .subtitle {
+            display: block;
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+        }
+
+        .top-metrics {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .metric-chip,
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 34px;
+            padding: 7px 11px;
+            border-radius: 999px;
+            border: 1px solid var(--stroke);
+            color: var(--muted);
+            background: rgba(255, 255, 255, 0.045);
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .metric-chip strong {
+            color: var(--text);
+            font-weight: 800;
+        }
+
+        .live-badge {
+            color: #ffe4e8;
+            border-color: rgba(255, 77, 100, 0.34);
+            background: rgba(255, 77, 100, 0.1);
+            box-shadow: 0 0 20px rgba(255, 77, 100, 0.14);
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--red);
+            box-shadow: 0 0 14px var(--red);
+        }
+
+        .status-pill.on {
+            color: #d6ffe9;
+            border-color: rgba(50, 245, 155, 0.38);
+            background: rgba(50, 245, 155, 0.12);
+            box-shadow: 0 0 22px rgba(50, 245, 155, 0.12);
+        }
+
+        .status-pill.off {
+            color: #ffddb1;
+            border-color: rgba(255, 184, 74, 0.28);
+            background: rgba(255, 184, 74, 0.1);
+        }
+
+        .toolbar {
+            border-radius: var(--radius);
+            padding: 11px;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            min-height: 38px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 9px 13px;
+            color: #f6fbff;
+            background: rgba(255, 255, 255, 0.055);
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 800;
+            transition: transform 160ms ease, border-color 160ms ease, background 160ms ease, box-shadow 160ms ease;
+            white-space: nowrap;
+        }
+
+        .btn::before {
+            content: attr(data-icon);
+            display: inline-grid;
+            place-items: center;
+            width: 19px;
+            height: 19px;
+            margin-right: 8px;
+            border-radius: 7px;
+            color: currentColor;
+            background: rgba(255, 255, 255, 0.08);
+            font-size: 10px;
+            vertical-align: -1px;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+            border-color: rgba(72, 216, 255, 0.36);
+            background: rgba(255, 255, 255, 0.09);
+            box-shadow: 0 10px 32px rgba(72, 216, 255, 0.12);
+        }
+
+        .btn:disabled {
+            opacity: 0.42;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-start {
+            color: #07120d;
+            border-color: rgba(50, 245, 155, 0.55);
+            background: linear-gradient(135deg, var(--green), #7cffc7);
+            box-shadow: 0 0 26px rgba(50, 245, 155, 0.18);
+        }
+
+        .btn-stop {
+            color: #fff6f7;
+            border-color: rgba(255, 77, 100, 0.42);
+            background: rgba(255, 77, 100, 0.16);
+        }
+
+        .btn-upload {
+            color: #06101a;
+            border-color: rgba(85, 167, 255, 0.48);
+            background: linear-gradient(135deg, var(--blue), var(--cyan));
+            box-shadow: 0 0 24px rgba(85, 167, 255, 0.18);
+        }
+
+        .file-wrap {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .file-wrap input[type=file] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .seek-wrap {
+            flex: 1 1 280px;
+            min-width: 230px;
+            max-width: 520px;
+            display: none;
+            margin-left: 4px;
+        }
+
+        .seek-wrap.visible { display: block; }
+
+        .seek-time {
+            color: var(--muted);
+            font-size: 11px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .seek-slider {
+            width: 100%;
+            margin: 6px 0 2px;
+            cursor: pointer;
+            accent-color: var(--cyan);
+        }
+
+        .progress-bar {
+            height: 4px;
+            overflow: hidden;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, var(--blue), var(--green));
+            box-shadow: 0 0 18px rgba(72, 216, 255, 0.38);
+        }
+
+        .main {
+            flex: 1;
+            min-height: 0;
+            display: grid;
+            grid-template-columns: minmax(190px, 230px) minmax(0, 1fr) minmax(260px, 320px);
+            gap: 14px;
+        }
+
+        .filter-panel,
+        .alerts-panel {
+            border-radius: var(--radius);
+            padding: 15px;
+            overflow: hidden;
+        }
+
+        .panel-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .panel-title h2,
+        .panel-title h3 {
+            margin: 0;
+            color: #f7fbff;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+        }
+
+        .panel-kicker {
+            color: var(--dim);
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .filter-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .filter-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-height: 42px;
+            padding: 9px 10px;
+            border: 1px solid var(--stroke);
+            border-radius: 13px;
+            background: rgba(255, 255, 255, 0.035);
+            color: #dfeaff;
+            cursor: pointer;
+            transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+        }
+
+        .filter-option:hover {
+            transform: translateX(2px);
+            border-color: rgba(72, 216, 255, 0.28);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .filter-option input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .filter-check {
+            width: 18px;
+            height: 18px;
+            display: grid;
+            place-items: center;
+            flex: 0 0 auto;
+            border-radius: 6px;
+            border: 1px solid currentColor;
+            color: var(--accent);
+            background: rgba(255, 255, 255, 0.04);
+            box-shadow: 0 0 16px rgba(255, 255, 255, 0.04);
+        }
+
+        .filter-check::after {
+            content: "";
+            width: 8px;
+            height: 4px;
+            border-left: 2px solid #07120d;
+            border-bottom: 2px solid #07120d;
+            transform: rotate(-45deg) translate(1px, -1px);
+            opacity: 0;
+        }
+
+        .filter-option input:checked + .filter-check {
+            background: var(--accent);
+            border-color: var(--accent);
+            box-shadow: 0 0 20px color-mix(in srgb, var(--accent), transparent 58%);
+        }
+
+        .filter-option input:checked + .filter-check::after { opacity: 1; }
+
+        .filter-icon {
+            width: 28px;
+            height: 28px;
+            display: grid;
+            place-items: center;
+            border-radius: 10px;
+            color: var(--accent);
+            background: color-mix(in srgb, var(--accent), transparent 88%);
+            font-size: 11px;
+            font-weight: 900;
+        }
+
+        .filter-name {
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .system-card {
+            margin-top: 14px;
+            padding: 13px;
+            border: 1px solid var(--stroke);
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.035);
+        }
+
+        .status-grid {
+            display: grid;
+            gap: 10px;
+        }
+
+        .status-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .status-row strong {
+            min-width: 0;
+            overflow: hidden;
+            color: var(--text);
+            font-size: 12px;
+            text-align: right;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .video-panel {
+            position: relative;
+            min-height: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border-radius: 22px;
+            border: 1px solid rgba(72, 216, 255, 0.2);
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.045), transparent),
+                #000;
+            box-shadow:
+                inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+                0 0 52px rgba(72, 216, 255, 0.1),
+                var(--shadow);
+        }
+
+        .video-panel::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            background:
+                linear-gradient(90deg, rgba(72, 216, 255, 0.08), transparent 16%, transparent 84%, rgba(50, 245, 155, 0.08)),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.04), transparent 18%, transparent 82%, rgba(0, 0, 0, 0.3));
+        }
+
+        .video-panel img {
+            position: relative;
+            z-index: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #000;
+            image-rendering: auto;
+        }
+
+        .video-hint {
+            position: absolute;
+            z-index: 2;
+            left: 50%;
+            bottom: 16px;
+            transform: translateX(-50%);
+            max-width: calc(100% - 32px);
+            padding: 8px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 999px;
+            color: #aebdd0;
+            background: rgba(5, 10, 18, 0.62);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            font-size: 11px;
+            font-weight: 700;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .alerts-panel {
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        #alerts-container {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        #alerts-container::-webkit-scrollbar { width: 6px; }
+        #alerts-container::-webkit-scrollbar-thumb {
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.16);
+        }
+
+        .alert-card {
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 10px;
+            padding: 12px;
+            border: 1px solid var(--stroke);
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.04);
+            animation: alertIn 220ms ease both;
+        }
+
+        .alert-card::before {
+            content: "";
+            position: absolute;
+            inset: 0 auto 0 0;
+            width: 3px;
+            background: var(--alert);
+            box-shadow: 0 0 18px var(--alert);
+        }
+
+        .alert-card.FALL { --alert: var(--red); background: rgba(255, 77, 100, 0.08); border-color: rgba(255, 77, 100, 0.24); }
+        .alert-card.PHONE { --alert: var(--orange); background: rgba(255, 184, 74, 0.08); border-color: rgba(255, 184, 74, 0.22); }
+        .alert-card.ZONE { --alert: var(--blue); background: rgba(85, 167, 255, 0.08); border-color: rgba(85, 167, 255, 0.22); }
+        .alert-card.INACTIVITY { --alert: #ffe66d; background: rgba(255, 230, 109, 0.07); border-color: rgba(255, 230, 109, 0.2); }
+        .alert-card.STANDING_INACTIVITY { --alert: var(--blue); background: rgba(85, 167, 255, 0.08); border-color: rgba(85, 167, 255, 0.22); }
+        .alert-card.SLEEPING { --alert: #d98cff; background: rgba(217, 140, 255, 0.07); border-color: rgba(217, 140, 255, 0.2); }
+
+        .alert-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 7px;
+        }
+
+        .alert-type {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            color: var(--alert);
+            font-size: 11px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .alert-icon {
+            width: 24px;
+            height: 24px;
+            display: grid;
+            place-items: center;
+            border-radius: 9px;
+            background: color-mix(in srgb, var(--alert), transparent 86%);
+        }
+
+        .alert-msg {
+            color: #dbe7f8;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .alert-time {
+            color: var(--dim);
+            font-size: 10px;
+            white-space: nowrap;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .no-alerts {
+            display: grid;
+            place-items: center;
+            min-height: 160px;
+            margin: 0;
+            border: 1px dashed rgba(255, 255, 255, 0.12);
+            border-radius: 14px;
+            color: var(--dim);
+            font-size: 12px;
+            text-align: center;
+        }
+
+        @keyframes alertIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 1120px) {
+            body { overflow: auto; }
+            .app-shell { height: auto; min-height: 100vh; }
+            .main {
+                grid-template-columns: 220px minmax(0, 1fr);
+                grid-template-areas:
+                    "filters video"
+                    "alerts alerts";
+            }
+            .filter-panel { grid-area: filters; }
+            .video-panel { grid-area: video; min-height: 54vw; }
+            .alerts-panel { grid-area: alerts; min-height: 260px; }
+        }
+
+        @media (max-width: 760px) {
+            .app-shell { padding: 10px; gap: 10px; }
+            .topbar { align-items: flex-start; flex-direction: column; }
+            .top-metrics { justify-content: flex-start; }
+            .toolbar { align-items: stretch; }
+            .btn, .file-wrap { flex: 1 1 calc(50% - 8px); }
+            .file-wrap .btn { width: 100%; }
+            .main {
+                display: flex;
+                flex-direction: column;
+            }
+            .video-panel { min-height: 62vw; border-radius: 18px; }
+            .filter-panel, .alerts-panel { padding: 12px; }
+            .filter-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .filter-option { padding: 9px; }
+        }
+
+        @media (max-width: 480px) {
+            .btn, .file-wrap { flex-basis: 100%; }
+            .filter-list { grid-template-columns: 1fr; }
+            .video-panel {
+                align-items: stretch;
+                flex-direction: column;
+            }
+            .video-panel img { height: auto; flex: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-shell">
+        <header class="topbar">
+            <div class="brand">
+                <span class="brand-mark">AI</span>
+                <span>
+                    <span class="logo">VisionGuard AI</span>
+                    <span class="subtitle">Enterprise edge surveillance</span>
+                </span>
+            </div>
+            <div class="top-metrics">
+                <span class="metric-chip live-badge"><span class="live-dot"></span> LIVE MONITOR</span>
+                <span class="metric-chip" id="fps-display">FPS <strong>--</strong></span>
+                <span class="status-pill off" id="det-status">Detection OFF</span>
+            </div>
+        </header>
+
+        <nav class="toolbar" aria-label="VisionGuard controls">
+            <button class="btn btn-start" id="btn-start" data-icon="ON">Start Detection</button>
+            <button class="btn btn-stop" id="btn-stop" data-icon="OFF" disabled>Stop Detection</button>
+            <button class="btn btn-secondary" id="btn-webcam" data-icon="CAM">Webcam</button>
+            <div class="file-wrap">
+                <button class="btn btn-upload" type="button" data-icon="UP">Upload CCTV Video</button>
+                <input type="file" id="file-input" accept=".mp4,.avi,.mov,.mkv,.webm">
+            </div>
+            <button class="btn btn-secondary" id="btn-pause" data-icon="II" disabled>Pause</button>
+            <button class="btn btn-secondary" id="btn-resume" data-icon="PL" disabled>Resume</button>
+            <button class="btn btn-secondary" id="btn-restart" data-icon="RE" disabled>Restart</button>
+            <button class="btn btn-secondary" id="btn-clear" data-icon="CL">Clear Alerts</button>
+
+            <div class="seek-wrap" id="seek-wrap">
+                <div class="seek-time" id="seek-time">0:00 / 0:00</div>
+                <input type="range" class="seek-slider" id="seek-slider" min="0" max="1000" value="0" disabled>
+                <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+            </div>
+        </nav>
+
+        <main class="main">
+            <aside class="filter-panel glass-panel" aria-label="Detection filters">
+                <div class="panel-title">
+                    <h2>Detection Filters</h2>
+                    <span class="panel-kicker">Overlay</span>
+                </div>
+                <div class="filter-list">
+                    <label class="filter-option" style="--accent: var(--green);">
+                        <input type="checkbox" checked>
+                        <span class="filter-check"></span>
+                        <span class="filter-icon">PE</span>
+                        <span class="filter-name">Person</span>
+                    </label>
+                    <label class="filter-option" style="--accent: var(--orange);">
+                        <input type="checkbox" checked>
+                        <span class="filter-check"></span>
+                        <span class="filter-icon">MO</span>
+                        <span class="filter-name">Mobile</span>
+                    </label>
+                    <label class="filter-option" style="--accent: var(--red);">
+                        <input type="checkbox" checked>
+                        <span class="filter-check"></span>
+                        <span class="filter-icon">FA</span>
+                        <span class="filter-name">Fall</span>
+                    </label>
+                    <label class="filter-option" style="--accent: var(--blue);">
+                        <input type="checkbox" checked>
+                        <span class="filter-check"></span>
+                        <span class="filter-icon">ST</span>
+                        <span class="filter-name">Standing</span>
+                    </label>
+                </div>
+
+                <section class="system-card" aria-label="System status">
+                    <div class="panel-title">
+                        <h3>System Status</h3>
+                    </div>
+                    <div class="status-grid">
+                        <div class="status-row"><span>Detection</span><strong id="status-detection">OFF</strong></div>
+                        <div class="status-row"><span>FPS</span><strong id="status-fps">--</strong></div>
+                        <div class="status-row"><span>Source</span><strong id="source-label">Webcam</strong></div>
+                        <div class="status-row"><span>Model</span><strong>YOLOv8n</strong></div>
+                        <div class="status-row"><span>Target FPS</span><strong>30</strong></div>
+                        <div class="status-row"><span>Resolution</span><strong>640 x 360</strong></div>
+                    </div>
+                </section>
+            </aside>
+
+            <section class="video-panel" aria-label="Live video feed">
+                <img src="/video_feed" alt="Live feed" id="video-stream">
+                <span class="video-hint" id="video-hint">Upload a video or use webcam, then start detection</span>
+            </section>
+
+            <aside class="alerts-panel glass-panel" aria-label="Alert log">
+                <div class="panel-title">
+                    <h2>Alert Log</h2>
+                    <span class="panel-kicker" id="alert-count">0 Events</span>
+                </div>
+                <div id="alerts-container"><p class="no-alerts">No alerts yet</p></div>
+            </aside>
+        </main>
+    </div>
+
+    <script>
+        const btnStart = document.getElementById("btn-start");
+        const btnStop = document.getElementById("btn-stop");
+        const btnWebcam = document.getElementById("btn-webcam");
+        const btnPause = document.getElementById("btn-pause");
+        const btnResume = document.getElementById("btn-resume");
+        const btnRestart = document.getElementById("btn-restart");
+        const btnClear = document.getElementById("btn-clear");
+        const fileInput = document.getElementById("file-input");
+        const detStatus = document.getElementById("det-status");
+        const sourceLabel = document.getElementById("source-label");
+        const seekWrap = document.getElementById("seek-wrap");
+        const seekSlider = document.getElementById("seek-slider");
+        const seekTime = document.getElementById("seek-time");
+        const progressFill = document.getElementById("progress-fill");
+        const fpsDisplay = document.getElementById("fps-display");
+        const statusDetection = document.getElementById("status-detection");
+        const statusFps = document.getElementById("status-fps");
+        const alertCount = document.getElementById("alert-count");
+        const videoHint = document.getElementById("video-hint");
+
+        let knownAlertCount = 0;
+        let userSeeking = false;
+
+        function fmtTime(sec) {
+            sec = Math.max(0, Math.floor(sec));
+            const m = Math.floor(sec / 60);
+            const s = sec % 60;
+            return m + ":" + String(s).padStart(2, "0");
+        }
+
+        seekSlider.addEventListener("mousedown", () => { userSeeking = true; });
+        seekSlider.addEventListener("touchstart", () => { userSeeking = true; });
+        seekSlider.addEventListener("change", async () => {
+            userSeeking = false;
+            await api("/api/playback/seek", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ percent: parseFloat(seekSlider.value) / 10 }),
+            });
+        });
+        seekSlider.addEventListener("input", () => {
+            const pct = parseFloat(seekSlider.value) / 10;
+            progressFill.style.width = pct + "%";
+        });
+
+        async function api(path, opts = {}) {
+            const res = await fetch(path, opts);
+            return res.json();
+        }
+
+        btnStart.onclick = async () => {
+            await api("/api/detection/start", { method: "POST" });
+            refreshUI({ detection_enabled: true });
+        };
+
+        btnStop.onclick = async () => {
+            await api("/api/detection/stop", { method: "POST" });
+            refreshUI({ detection_enabled: false });
+        };
+
+        btnWebcam.onclick = async () => {
+            await api("/api/source/webcam", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" });
+            videoHint.textContent = "Webcam source selected";
+        };
+
+        fileInput.onchange = async () => {
+            const file = fileInput.files[0];
+            if (!file) return;
+            videoHint.textContent = "Uploading " + file.name + "...";
+            const fd = new FormData();
+            fd.append("video", file);
+            const data = await api("/api/upload", { method: "POST", body: fd });
+            if (!data.ok) alert(data.error || "Upload failed");
+            else videoHint.textContent = "Playing: " + data.filename + " - detection ON";
+            fileInput.value = "";
+        };
+
+        btnPause.onclick = () => api("/api/playback/pause", { method: "POST" });
+        btnResume.onclick = () => api("/api/playback/resume", { method: "POST" });
+        btnRestart.onclick = () => api("/api/playback/restart", { method: "POST" });
+        btnClear.onclick = async () => {
+            await api("/api/alerts/clear", { method: "POST" });
+            knownAlertCount = 0;
+            renderAlerts([]);
+        };
+
+        function refreshUI(data) {
+            const on = data.detection_enabled;
+            detStatus.textContent = on ? "Detection ON" : "Detection OFF";
+            detStatus.className = "status-pill " + (on ? "on" : "off");
+            statusDetection.textContent = on ? "ON" : "OFF";
+            btnStart.disabled = on;
+            btnStop.disabled = !on;
+
+            if (data.source_name) sourceLabel.textContent = data.source_name;
+
+            const isFile = data.source_type === "file";
+            btnPause.disabled = !isFile;
+            btnResume.disabled = !isFile;
+            btnRestart.disabled = !isFile;
+            seekWrap.classList.toggle("visible", isFile);
+            seekSlider.disabled = !isFile;
+
+            if (isFile && data.playback) {
+                const f = data.playback.frame || 0;
+                const t = data.playback.total || 0;
+                const vfps = data.playback.fps || 30;
+                const pct = t > 0 ? (f / t) * 100 : 0;
+                progressFill.style.width = pct + "%";
+                const curSec = f / vfps;
+                const totSec = t / vfps;
+                seekTime.textContent = fmtTime(curSec) + " / " + fmtTime(totSec)
+                    + (data.paused ? " (paused)" : "") + "  |  frame " + f + "/" + t;
+                if (!userSeeking) {
+                    seekSlider.value = Math.round(pct * 10);
+                }
+            }
+        }
+
+        function renderAlerts(alerts) {
+            const container = document.getElementById("alerts-container");
+            alertCount.textContent = alerts.length + (alerts.length === 1 ? " Event" : " Events");
+            if (!alerts.length) {
+                container.innerHTML = '<p class="no-alerts">No alerts yet</p>';
+                return;
+            }
+            const labels = {
+                FALL: { text: "Fall", icon: "FA" },
+                PHONE: { text: "Mobile", icon: "MO" },
+                ZONE: { text: "Zone", icon: "ZO" },
+                INACTIVITY: { text: "Inactivity", icon: "IN" },
+                STANDING_INACTIVITY: { text: "Standing", icon: "ST" },
+                SLEEPING: { text: "Sleeping", icon: "SL" }
+            };
+            container.innerHTML = [...alerts].reverse().map(a => {
+                const meta = labels[a.type] || { text: a.type, icon: "AI" };
+                return `
+                    <div class="alert-card ${a.type}">
+                        <div class="alert-head">
+                            <div class="alert-type"><span class="alert-icon">${meta.icon}</span>${meta.text}</div>
+                            <div class="alert-time">${a.time}</div>
+                        </div>
+                        <div class="alert-msg">${a.msg}</div>
+                    </div>
+                `;
+            }).join("");
+        }
+
+        async function poll() {
+            try {
+                const res = await fetch("/alerts");
+                const data = await res.json();
+                const fps = data.fps ?? "--";
+                fpsDisplay.innerHTML = "FPS <strong>" + fps + "</strong>";
+                statusFps.textContent = fps;
+                refreshUI(data);
+                if (data.alerts.length !== knownAlertCount) {
+                    knownAlertCount = data.alerts.length;
+                    renderAlerts(data.alerts);
+                }
+            } catch (e) {}
+        }
+
+        setInterval(poll, 800);
+        poll();
+    </script>
+</body>
+</html>
